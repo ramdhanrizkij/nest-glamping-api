@@ -18,6 +18,8 @@ var allMigrations = []*gormigrate.Migration{
 	migrations.CreateAmenities,
 	migrations.CreateTentTypeAmenities,
 	migrations.CreateTents,
+	migrations.CreateBookings,
+	migrations.CreateBookingTents,
 }
 
 func RunMigration(db *gorm.DB) error {
@@ -37,6 +39,8 @@ func RunMigration(db *gorm.DB) error {
 			&migrations.Amenity{},
 			&migrations.TentTypeAmenity{},
 			&migrations.Tent{},
+			&migrations.Booking{},
+			&migrations.BookingTent{},
 		); err != nil {
 			return err
 		}

@@ -10,6 +10,9 @@ import (
 	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/auth"
 	authRepo "github.com/ramdhanrizkij/nest-glamping-api/internal/features/auth/repository"
 	authUsecase "github.com/ramdhanrizkij/nest-glamping-api/internal/features/auth/usecase"
+	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings"
+	bookingsRepo "github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings/repository"
+	bookingsUsecase "github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings/usecase"
 	tenttypes "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tent-types"
 	tentTypesRepo "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tent-types/repository"
 	tentTypesUsecase "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tent-types/usecase"
@@ -33,6 +36,7 @@ type Dependencies struct {
 	AmenityModule   *amenities.Module
 	TentTypeModule  *tenttypes.Module
 	TentModule      *tents.Module
+	BookingModule   *bookings.Module
 }
 
 func NewDependencies(db *gorm.DB) *Dependencies {
@@ -50,6 +54,7 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 	amenityRepository := amenitiesRepo.NewRepository(db)
 	tentTypeRepository := tentTypesRepo.NewRepository(db)
 	tentRepository := tentsRepo.NewRepository(db)
+	bookingRepository := bookingsRepo.NewRepository(db)
 
 	// Usecases
 	userService := usersUsecase.NewUsecase(userRepository)
@@ -57,6 +62,7 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 	amenityService := amenitiesUsecase.NewUsecase(amenityRepository)
 	tentTypeService := tentTypesUsecase.NewUsecase(tentTypeRepository)
 	tentService := tentsUsecase.NewUsecase(tentRepository, tentTypeRepository)
+	bookingService := bookingsUsecase.NewUsecase(bookingRepository, tentRepository, tentTypeRepository)
 
 	// Modules
 	userModule := users.NewModule(userService)
@@ -64,6 +70,7 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 	amenityModule := amenities.NewModule(amenityService)
 	tentTypeModule := tenttypes.NewModule(tentTypeService)
 	tentModule := tents.NewModule(tentService)
+	bookingModule := bookings.NewModule(bookingService)
 
 	return &Dependencies{
 		DB:              db,
@@ -76,5 +83,6 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 		AmenityModule:   amenityModule,
 		TentTypeModule:  tentTypeModule,
 		TentModule:      tentModule,
+		BookingModule:   bookingModule,
 	}
 }

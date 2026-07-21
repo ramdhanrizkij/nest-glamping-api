@@ -21,4 +21,5 @@ func SetupRoutes(app *fiber.App, deps *Dependencies) {
 	deps.AmenityModule.RegisterRoutes(api, deps.JWTSecret)
 	deps.TentTypeModule.RegisterRoutes(api, deps.JWTSecret)
 	deps.TentModule.RegisterRoutes(api, deps.JWTSecret)
+	deps.BookingModule.RegisterRoutes(api, deps.JWTSecret)
 }

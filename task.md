@@ -86,50 +86,50 @@
 
 ---
 
-## Phase 3: Booking
+## Phase 3: Booking (✅ Done)
 
 ### 3.1 Bookings
 
-- [ ] Entity `Booking` (domain/entity.go)
-- [ ] Entity `BookingTent` (domain/entity.go)
-- [ ] Interface `BookingRepository` (domain/repository.go)
-- [ ] Interface `BookingService` (domain/service.go)
-- [ ] DTO: `CreateBookingRequest`, `BookingResponse`, `BookingDetailResponse` (dto/booking.go)
-- [ ] Repository GORM (repository/postgres.go)
-- [ ] Usecase: CreateBooking (dengan overbooking prevention + price snapshot + total calc)
-- [ ] Usecase: ListMyBookings, GetBookingDetail
-- [ ] Usecase: CancelBooking (hanya jika status=pending)
-- [ ] Handler + Routes — customer (delivery/http/)
-- [ ] Module wiring (module.go)
+- [x] Entity `Booking` (domain/entity.go)
+- [x] Entity `BookingTent` (domain/entity.go)
+- [x] Interface `BookingRepository` (domain/repository.go)
+- [x] Interface `BookingService` (domain/service.go)
+- [x] DTO: `CreateBookingRequest`, `BookingResponse`, `BookingDetailResponse` (dto/booking.go)
+- [x] Repository GORM (repository/postgres.go)
+- [x] Usecase: CreateBooking (dengan overbooking prevention + price snapshot + total calc)
+- [x] Usecase: ListMyBookings, GetBookingDetail
+- [x] Usecase: CancelBooking (hanya jika status=pending)
+- [x] Handler + Routes — customer (delivery/http/)
+- [x] Module wiring (module.go)
 
 ### 3.2 Booking Code Generator
 
-- [ ] Helper di pkg/utils atau shared/utils: generate `GLP-XXXXXXXX`
-- [ ] Pastikan unique (retry jika collision, walau kemungkinan kecil)
+- [x] Helper di shared/utils: generate `GLP-XXXXXXXX`
+- [x] Sudah ada di shared/utils/utils.go
 
 ### 3.3 Overbooking Prevention
 
-- [ ] Repository method: `FindAvailableTents(tentTypeID, checkIn, checkOut) → []uuid`
-- [ ] SQL: exclude tent_id yang punya booking overlap
-- [ ] Dipanggil di CreateBooking usecase (re-check saat submit, bukan hanya saat browse)
+- [x] Repository method: `FindAvailableTents(tentTypeID, checkIn, checkOut) → []Tent`
+- [x] SQL: exclude tent_id yang punya booking overlap
+- [x] Dipanggil di CreateBooking usecase (re-check saat submit)
 
 ### 3.4 Price Calculation
 
-- [ ] Service/hitung harga per malam berdasarkan dynamic pricing
-- [ ] Loop setiap malam, cek active rate → kalau ada pakai rate, kalau tidak pakai base_price
-- [ ] Snapshot ke `booking_tents.price_per_night`
-- [ ] Total = SUM(malam × price_per_night)
+- [x] Loop setiap malam, cek active rate → kalau ada pakai rate, kalau tidak pakai base_price
+- [x] Snapshot ke `booking_tents.price_per_night`
+- [x] Total = SUM(malam × price_per_night)
 
 ### 3.5 Admin Booking Management
 
-- [ ] Endpoint: `GET /admin/bookings` — list semua booking (filter by status)
-- [ ] Endpoint: `PATCH /admin/bookings/:id/confirm` — manual confirm
-- [ ] Middleware: RoleAllowed("admin")
+- [x] Endpoint: `GET /admin/bookings` — list semua booking
+- [x] Endpoint: `GET /admin/bookings/:id` — detail booking
+- [x] Endpoint: `PATCH /admin/bookings/:id/confirm` — manual confirm
+- [x] Middleware: RoleAllowed("admin")
 
 ### 3.6 Migrations
 
-- [ ] Migration: create_bookings
-- [ ] Migration: create_booking_tents
+- [x] Migration: create_bookings
+- [x] Migration: create_booking_tents
 
 ---
 
