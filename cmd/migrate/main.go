@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	action := flag.String("action", "migrate", "migrate | rollback | rollback-all")
+	action := flag.String("action", "migrate", "migrate | rollback | rollback-all | seed")
 	flag.Parse()
 
 	config.LoadEnv()
@@ -28,6 +28,10 @@ func main() {
 		if err := bootstrap.RunMigration(db); err != nil {
 			log.Fatal("Migration failed: ", err)
 		}
+	case "seed":
+		if err := bootstrap.Seed(db); err != nil {
+			log.Fatal("Seed failed: ", err)
+		}
 	case "rollback":
 		if err := bootstrap.RollbackLast(db); err != nil {
 			log.Fatal("Rollback failed: ", err)
@@ -39,7 +43,7 @@ func main() {
 		}
 		log.Info("Rollback all completed")
 	default:
-		fmt.Println("Usage: go run cmd/migrate/main.go -action=[migrate|rollback|rollback-all]")
+		fmt.Println("Usage: go run cmd/migrate/main.go -action=[migrate|rollback|rollback-all|seed]")
 		os.Exit(1)
 	}
 }

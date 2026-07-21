@@ -15,7 +15,10 @@ func SetupRoutes(app *fiber.App, deps *Dependencies) {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})
 
-	// Feature modules register their routes here
+	// Feature modules
 	deps.AuthModule.RegisterRoutes(api)
 	deps.UserModule.RegisterRoutes(api, deps.JWTSecret)
+	deps.AmenityModule.RegisterRoutes(api, deps.JWTSecret)
+	deps.TentTypeModule.RegisterRoutes(api, deps.JWTSecret)
+	deps.TentModule.RegisterRoutes(api, deps.JWTSecret)
 }

@@ -7,13 +7,21 @@ import (
 	"gorm.io/gorm"
 )
 
+var allMigrations = []*gormigrate.Migration{
+	migrations.CreateRoles,
+	migrations.CreatePermissions,
+	migrations.CreateUsers,
+	migrations.CreateRefreshTokens,
+	migrations.CreateTentTypes,
+	migrations.CreateTentTypeRates,
+	migrations.CreateTentTypeImages,
+	migrations.CreateAmenities,
+	migrations.CreateTentTypeAmenities,
+	migrations.CreateTents,
+}
+
 func RunMigration(db *gorm.DB) error {
-	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
-		migrations.CreateRoles,
-		migrations.CreatePermissions,
-		migrations.CreateUsers,
-		migrations.CreateRefreshTokens,
-	})
+	m := gormigrate.New(db, gormigrate.DefaultOptions, allMigrations)
 
 	m.InitSchema(func(tx *gorm.DB) error {
 		log.Info("Initializing schema (fresh database)...")
@@ -23,6 +31,12 @@ func RunMigration(db *gorm.DB) error {
 			&migrations.RolePermission{},
 			&migrations.User{},
 			&migrations.RefreshToken{},
+			&migrations.TentType{},
+			&migrations.TentTypeRate{},
+			&migrations.TentTypeImage{},
+			&migrations.Amenity{},
+			&migrations.TentTypeAmenity{},
+			&migrations.Tent{},
 		); err != nil {
 			return err
 		}
@@ -46,21 +60,11 @@ func RunMigration(db *gorm.DB) error {
 }
 
 func RollbackLast(db *gorm.DB) error {
-	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
-		migrations.CreateRoles,
-		migrations.CreatePermissions,
-		migrations.CreateUsers,
-		migrations.CreateRefreshTokens,
-	})
+	m := gormigrate.New(db, gormigrate.DefaultOptions, allMigrations)
 	return m.RollbackLast()
 }
 
 func RollbackAll(db *gorm.DB) error {
-	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
-		migrations.CreateRoles,
-		migrations.CreatePermissions,
-		migrations.CreateUsers,
-		migrations.CreateRefreshTokens,
-	})
+	m := gormigrate.New(db, gormigrate.DefaultOptions, allMigrations)
 	return m.RollbackTo("0")
 }

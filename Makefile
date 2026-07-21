@@ -1,4 +1,4 @@
-.PHONY: run build dev test clean migrate migrate-rollback migrate-rollback-all lint tidy
+.PHONY: run build dev test clean migrate migrate-rollback migrate-rollback-all seed seed-fresh lint tidy
 
 APP_NAME = glamping-api
 BUILD_DIR = ./bin
@@ -26,6 +26,14 @@ migrate-rollback:
 
 migrate-rollback-all:
 	go run cmd/migrate/main.go -action=rollback-all
+
+seed:
+	go run cmd/migrate/main.go -action=seed
+
+seed-fresh:
+	go run cmd/migrate/main.go -action=rollback-all
+	go run cmd/migrate/main.go -action=migrate
+	go run cmd/migrate/main.go -action=seed
 
 lint:
 	golangci-lint run ./...
