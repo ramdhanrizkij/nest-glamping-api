@@ -1,0 +1,169 @@
+Project GlampingBookingSystem {
+  database_type: 'PostgreSQL'
+  Note: 'Database Desain Sistem Pemesanan Glamping (Final - V4)'
+}
+
+// ================= RBAC TABLES (Role-Based Access Control) ================= //
+Table roles {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(50) [unique, not null, note: 'Contoh: admin, customer']
+  description text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table permissions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(100) [unique, not null, note: 'Contoh: create_booking, view_reports']
+  description text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table role_permissions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  role_id uuid [not null]
+  permission_id uuid [not null]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+  Note: 'Unique constraint on (role_id, permission_id)'
+}
+
+// ================= CORE & USER TABLES ================= //
+Table users {
+  id uuid [pk, default: `gen_random_uuid()`]
+  role_id uuid [not null]
+  name varchar(255) [not null]
+  email varchar(255) [unique, not null]
+  password_hash varchar(255) [not null]
+  phone_number varchar(20)
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+// ================= TENT MASTER DATA ================= //
+Table tent_types {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(255) [not null]
+  description text
+  capacity int [not null, default: 2]
+  base_price decimal(12,2) [not null, note: 'Harga dasar reguler']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table tent_type_rates {
+  id uuid [pk, default: `gen_random_uuid()`]
+  tent_type_id uuid [not null]
+  start_date date [not null]
+  end_date date [not null]
+  price_per_night decimal(12,2) [not null, note: 'Harga menimpa base_price']
+  description varchar(255) [note: 'Contoh: High Season Lebaran']
+  is_active boolean [default: true]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table tent_type_images {
+  id uuid [pk, default: `gen_random_uuid()`]
+  tent_type_id uuid [not null]
+  image_url varchar(255) [not null]
+  is_primary boolean [default: false, note: 'Cover image marker']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table amenities {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(100) [not null]
+  icon_url varchar(255)
+  description text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table tent_type_amenities {
+  id uuid [pk, default: `gen_random_uuid()`]
+  tent_type_id uuid [not null]
+  amenity_id uuid [not null]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table tents {
+  id uuid [pk, default: `gen_random_uuid()`]
+  tent_type_id uuid [not null]
+  name_or_number varchar(100) [not null, note: 'Contoh: Safari-01']
+  status varchar(50) [default: 'available', note: 'available, maintenance']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+// ================= BOOKING & PAYMENTS ================= //
+Table bookings {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null]
+  booking_code varchar(20) [unique, not null]
+  check_in_date date [not null]
+  check_in_time time
+  check_out_date date [not null]
+  check_out_time time
+  total_amount decimal(12,2) [not null]
+  status varchar(50) [default: 'pending', note: 'pending, confirmed, cancelled, completed']
+  guest_count int [not null, default: 1]
+  special_requests text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table booking_tents {
+  id uuid [pk, default: `gen_random_uuid()`]
+  booking_id uuid [not null]
+  tent_id uuid [not null]
+  price_per_night decimal(12,2) [not null, note: 'Harga yang dikunci saat pesan']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+Table payments {
+  id uuid [pk, default: `gen_random_uuid()`]
+  booking_id uuid [not null]
+  amount decimal(12,2) [not null]
+  payment_method varchar(100)
+  payment_status varchar(50) [default: 'unpaid', note: 'unpaid, paid, refunded, failed']
+  payment_date timestamp
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp [null]
+}
+
+// ================= RELATIONS ================= //
+// RBAC Relations
+Ref: users.role_id > roles.id
+Ref: role_permissions.role_id > roles.id
+Ref: role_permissions.permission_id > permissions.id
+
+// Tent Specs & Inventory Relations
+Ref: tents.tent_type_id > tent_types.id
+Ref: tent_type_rates.tent_type_id > tent_types.id
+Ref: tent_type_images.tent_type_id > tent_types.id
+Ref: tent_type_amenities.tent_type_id > tent_types.id
+Ref: tent_type_amenities.amenity_id > amenities.id
+
+// Booking & Transaction Relations
+Ref: bookings.user_id > users.id
+Ref: booking_tents.booking_id > bookings.id
+Ref: booking_tents.tent_id > tents.id
+Ref: payments.booking_id - bookings.id
