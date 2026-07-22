@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	tentTypeDomain "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tent-types/domain"
-	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/tents/dto"
 	tentDomain "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tents/domain"
+	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/tents/dto"
 	appErr "github.com/ramdhanrizkij/nest-glamping-api/internal/shared/errors"
 )
 
@@ -37,7 +37,7 @@ func (u *usecase) Create(req dto.CreateTentRequest) (*dto.TentResponse, error) {
 	tent := &tentDomain.Tent{
 		ID:         uuid.New(),
 		TentTypeID: ttUUID,
-		NameOrNum:  req.NameOrNum,
+		Code:       req.Code,
 		Status:     status,
 	}
 
@@ -48,7 +48,7 @@ func (u *usecase) Create(req dto.CreateTentRequest) (*dto.TentResponse, error) {
 	return &dto.TentResponse{
 		ID:         tent.ID.String(),
 		TentTypeID: tent.TentTypeID.String(),
-		NameOrNum:  tent.NameOrNum,
+		Code:       tent.Code,
 		Status:     tent.Status,
 	}, nil
 }
@@ -64,7 +64,7 @@ func (u *usecase) List() ([]dto.TentResponse, error) {
 		result = append(result, dto.TentResponse{
 			ID:         t.ID.String(),
 			TentTypeID: t.TentTypeID.String(),
-			NameOrNum:  t.NameOrNum,
+			Code:       t.Code,
 			Status:     t.Status,
 		})
 	}
@@ -87,7 +87,7 @@ func (u *usecase) ListByTentTypeID(tentTypeID string) ([]dto.TentResponse, error
 		result = append(result, dto.TentResponse{
 			ID:         t.ID.String(),
 			TentTypeID: t.TentTypeID.String(),
-			NameOrNum:  t.NameOrNum,
+			Code:       t.Code,
 			Status:     t.Status,
 		})
 	}
@@ -108,7 +108,7 @@ func (u *usecase) FindByID(id string) (*dto.TentResponse, error) {
 	return &dto.TentResponse{
 		ID:         tent.ID.String(),
 		TentTypeID: tent.TentTypeID.String(),
-		NameOrNum:  tent.NameOrNum,
+		Code:       tent.Code,
 		Status:     tent.Status,
 	}, nil
 }
@@ -124,8 +124,8 @@ func (u *usecase) Update(id string, req dto.UpdateTentRequest) (*dto.TentRespons
 		return nil, appErr.NotFound("tent not found")
 	}
 
-	if req.NameOrNum != "" {
-		tent.NameOrNum = req.NameOrNum
+	if req.Code != "" {
+		tent.Code = req.Code
 	}
 	if req.Status != "" {
 		tent.Status = req.Status
@@ -138,7 +138,7 @@ func (u *usecase) Update(id string, req dto.UpdateTentRequest) (*dto.TentRespons
 	return &dto.TentResponse{
 		ID:         tent.ID.String(),
 		TentTypeID: tent.TentTypeID.String(),
-		NameOrNum:  tent.NameOrNum,
+		Code:       tent.Code,
 		Status:     tent.Status,
 	}, nil
 }
@@ -193,7 +193,7 @@ func (u *usecase) CheckAvailability(tentTypeID string, checkIn, checkOut time.Ti
 
 		result = append(result, dto.AvailableTentResponse{
 			ID:            tent.ID.String(),
-			NameOrNum:     tent.NameOrNum,
+			Code:          tent.Code,
 			PricePerNight: totalPrice / float64(nights),
 		})
 	}

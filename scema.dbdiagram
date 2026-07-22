@@ -102,7 +102,7 @@ Table tent_type_amenities {
 Table tents {
   id uuid [pk, default: `gen_random_uuid()`]
   tent_type_id uuid [not null]
-  name_or_number varchar(100) [not null, note: 'Contoh: Safari-01']
+  code varchar(100) [not null, note: 'Contoh: Safari-01']
   status varchar(50) [default: 'available', note: 'available, maintenance']
   created_at timestamp [default: `CURRENT_TIMESTAMP`]
   updated_at timestamp [default: `CURRENT_TIMESTAMP`]

@@ -111,20 +111,20 @@ func Seed(db *gorm.DB) error {
 	// --- Tents (Units) ---
 	tents := []migrations.Tent{
 		// Safari Tent (3 units)
-		{TentTypeID: ttIDs[0], NameOrNum: "Safari-01", Status: "available"},
-		{TentTypeID: ttIDs[0], NameOrNum: "Safari-02", Status: "available"},
-		{TentTypeID: ttIDs[0], NameOrNum: "Safari-03", Status: "maintenance"},
+		{TentTypeID: ttIDs[0], Code: "Safari-01", Status: "available"},
+		{TentTypeID: ttIDs[0], Code: "Safari-02", Status: "available"},
+		{TentTypeID: ttIDs[0], Code: "Safari-03", Status: "maintenance"},
 		// Deluxe Camp (4 units)
-		{TentTypeID: ttIDs[1], NameOrNum: "Deluxe-01", Status: "available"},
-		{TentTypeID: ttIDs[1], NameOrNum: "Deluxe-02", Status: "available"},
-		{TentTypeID: ttIDs[1], NameOrNum: "Deluxe-03", Status: "available"},
-		{TentTypeID: ttIDs[1], NameOrNum: "Deluxe-04", Status: "available"},
+		{TentTypeID: ttIDs[1], Code: "Deluxe-01", Status: "available"},
+		{TentTypeID: ttIDs[1], Code: "Deluxe-02", Status: "available"},
+		{TentTypeID: ttIDs[1], Code: "Deluxe-03", Status: "available"},
+		{TentTypeID: ttIDs[1], Code: "Deluxe-04", Status: "available"},
 		// Family Glamp (2 units)
-		{TentTypeID: ttIDs[2], NameOrNum: "Family-01", Status: "available"},
-		{TentTypeID: ttIDs[2], NameOrNum: "Family-02", Status: "available"},
+		{TentTypeID: ttIDs[2], Code: "Family-01", Status: "available"},
+		{TentTypeID: ttIDs[2], Code: "Family-02", Status: "available"},
 		// Couple's Nest (2 units)
-		{TentTypeID: ttIDs[3], NameOrNum: "Couple-01", Status: "available"},
-		{TentTypeID: ttIDs[3], NameOrNum: "Couple-02", Status: "available"},
+		{TentTypeID: ttIDs[3], Code: "Couple-01", Status: "available"},
+		{TentTypeID: ttIDs[3], Code: "Couple-02", Status: "available"},
 	}
 	seedTents(db, tents)
 
@@ -212,7 +212,7 @@ func seedRates(db *gorm.DB, rates []migrations.TentTypeRate) {
 func seedTents(db *gorm.DB, tents []migrations.Tent) {
 	for _, t := range tents {
 		var existing migrations.Tent
-		if err := db.Where("tent_type_id = ? AND name_or_number = ?", t.TentTypeID, t.NameOrNum).First(&existing).Error; err != nil {
+		if err := db.Where("tent_type_id = ? AND name_or_number = ?", t.TentTypeID, t.Code).First(&existing).Error; err != nil {
 			db.Create(&t)
 		}
 	}

@@ -3,15 +3,15 @@ package migrations
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/go-gormigrate/gormigrate/v2"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Tent struct {
 	ID         uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	TentTypeID uuid.UUID      `gorm:"type:uuid;not null"`
-	NameOrNum  string         `gorm:"type:varchar(100);not null"`
+	Code       string         `gorm:"type:varchar(100);not null"`
 	Status     string         `gorm:"type:varchar(50);default:'available'"`
 	CreatedAt  time.Time      `gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt  time.Time      `gorm:"default:CURRENT_TIMESTAMP"`

@@ -13,8 +13,8 @@ import (
 )
 
 type usecase struct {
-	bookingRepo bookingDomain.Repository
-	tentRepo    tentDomain.Repository
+	bookingRepo  bookingDomain.Repository
+	tentRepo     tentDomain.Repository
 	tentTypeRepo tentTypeDomain.Repository
 }
 
@@ -317,7 +317,7 @@ func (u *usecase) toBookingResponse(booking *bookingDomain.Booking, bookingTents
 		tent, _ := u.tentRepo.FindByID(bt.TentID)
 		tentName := ""
 		if tent != nil {
-			tentName = tent.NameOrNum
+			tentName = tent.Code
 		}
 		tents = append(tents, dto.BookingTentItem{
 			ID:            bt.ID.String(),
