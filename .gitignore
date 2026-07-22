@@ -4,4 +4,6 @@ tmp/
 *.log
 spec.md
 task.md
-docs/
+docs/docs.go
+docs/swagger.json
+docs/swagger.yaml
