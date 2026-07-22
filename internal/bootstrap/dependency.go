@@ -13,6 +13,9 @@ import (
 	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings"
 	bookingsRepo "github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings/repository"
 	bookingsUsecase "github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings/usecase"
+	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/payments"
+	paymentsRepo "github.com/ramdhanrizkij/nest-glamping-api/internal/features/payments/repository"
+	paymentsUsecase "github.com/ramdhanrizkij/nest-glamping-api/internal/features/payments/usecase"
 	tenttypes "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tent-types"
 	tentTypesRepo "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tent-types/repository"
 	tentTypesUsecase "github.com/ramdhanrizkij/nest-glamping-api/internal/features/tent-types/usecase"
@@ -22,6 +25,7 @@ import (
 	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/users"
 	usersRepo "github.com/ramdhanrizkij/nest-glamping-api/internal/features/users/repository"
 	usersUsecase "github.com/ramdhanrizkij/nest-glamping-api/internal/features/users/usecase"
+	pg "github.com/ramdhanrizkij/nest-glamping-api/pkg/payment_gateway"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +41,7 @@ type Dependencies struct {
 	TentTypeModule  *tenttypes.Module
 	TentModule      *tents.Module
 	BookingModule   *bookings.Module
+	PaymentModule   *payments.Module
 }
 
 func NewDependencies(db *gorm.DB) *Dependencies {
@@ -55,6 +60,10 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 	tentTypeRepository := tentTypesRepo.NewRepository(db)
 	tentRepository := tentsRepo.NewRepository(db)
 	bookingRepository := bookingsRepo.NewRepository(db)
+	paymentRepository := paymentsRepo.NewRepository(db)
+
+	// Payment Gateway
+	paymentGateway := pg.NewManualGateway()
 
 	// Usecases
 	userService := usersUsecase.NewUsecase(userRepository)
@@ -63,6 +72,7 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 	tentTypeService := tentTypesUsecase.NewUsecase(tentTypeRepository)
 	tentService := tentsUsecase.NewUsecase(tentRepository, tentTypeRepository)
 	bookingService := bookingsUsecase.NewUsecase(bookingRepository, tentRepository, tentTypeRepository)
+	paymentService := paymentsUsecase.NewUsecase(paymentRepository, bookingRepository, paymentGateway)
 
 	// Modules
 	userModule := users.NewModule(userService)
@@ -71,6 +81,7 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 	tentTypeModule := tenttypes.NewModule(tentTypeService)
 	tentModule := tents.NewModule(tentService)
 	bookingModule := bookings.NewModule(bookingService)
+	paymentModule := payments.NewModule(paymentService)
 
 	return &Dependencies{
 		DB:              db,
@@ -84,5 +95,6 @@ func NewDependencies(db *gorm.DB) *Dependencies {
 		TentTypeModule:  tentTypeModule,
 		TentModule:      tentModule,
 		BookingModule:   bookingModule,
+		PaymentModule:   paymentModule,
 	}
 }

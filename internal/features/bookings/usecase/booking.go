@@ -165,7 +165,7 @@ func (u *usecase) CreateBooking(userID string, req dto.CreateBookingRequest) (*d
 	return u.toBookingResponse(booking, bookingTents), nil
 }
 
-func (u *usecase) ListMyBookings(userID string) ([]dto.BookingResponse, error) {
+func (u *usecase) ListMyBookings(userID string, page, perPage int) (*dto.BookingListResponse, error) {
 	userUUID, err := uuid.Parse(userID)
 	if err != nil {
 		return nil, appErr.BadRequest("invalid user id")
@@ -176,13 +176,32 @@ func (u *usecase) ListMyBookings(userID string) ([]dto.BookingResponse, error) {
 		return nil, appErr.Internal("failed to list bookings")
 	}
 
+	total := int64(len(bookings))
+	offset := (page - 1) * perPage
+	if offset >= len(bookings) {
+		offset = len(bookings)
+	}
+	end := offset + perPage
+	if end > len(bookings) {
+		end = len(bookings)
+	}
+	pageBookings := bookings[offset:end]
+
 	var result []dto.BookingResponse
-	for _, b := range bookings {
+	for _, b := range pageBookings {
 		tents, _ := u.bookingRepo.FindBookingTentsByBookingID(b.ID)
 		result = append(result, *u.toBookingResponse(&b, tents))
 	}
 
-	return result, nil
+	totalPages := int((total + int64(perPage) - 1) / int64(perPage))
+
+	return &dto.BookingListResponse{
+		Data:       result,
+		Total:      total,
+		Page:       page,
+		PerPage:    perPage,
+		TotalPages: totalPages,
+	}, nil
 }
 
 func (u *usecase) GetBookingDetail(bookingID, userID string, isAdmin bool) (*dto.BookingDetailResponse, error) {
@@ -240,19 +259,38 @@ func (u *usecase) CancelBooking(bookingID, userID string) error {
 	return u.bookingRepo.UpdateBookingStatus(bookingUUID, "cancelled")
 }
 
-func (u *usecase) ListAllBookings() ([]dto.BookingResponse, error) {
+func (u *usecase) ListAllBookings(page, perPage int) (*dto.BookingListResponse, error) {
 	bookings, err := u.bookingRepo.FindAllBookingsWithTents()
 	if err != nil {
 		return nil, appErr.Internal("failed to list bookings")
 	}
 
+	total := int64(len(bookings))
+	offset := (page - 1) * perPage
+	if offset >= len(bookings) {
+		offset = len(bookings)
+	}
+	end := offset + perPage
+	if end > len(bookings) {
+		end = len(bookings)
+	}
+	pageBookings := bookings[offset:end]
+
 	var result []dto.BookingResponse
-	for _, b := range bookings {
+	for _, b := range pageBookings {
 		tents, _ := u.bookingRepo.FindBookingTentsByBookingID(b.ID)
 		result = append(result, *u.toBookingResponse(&b, tents))
 	}
 
-	return result, nil
+	totalPages := int((total + int64(perPage) - 1) / int64(perPage))
+
+	return &dto.BookingListResponse{
+		Data:       result,
+		Total:      total,
+		Page:       page,
+		PerPage:    perPage,
+		TotalPages: totalPages,
+	}, nil
 }
 
 func (u *usecase) ConfirmBooking(bookingID string) error {

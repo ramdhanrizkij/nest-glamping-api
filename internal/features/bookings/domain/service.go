@@ -4,9 +4,9 @@ import "github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings/dt
 
 type Service interface {
 	CreateBooking(userID string, req dto.CreateBookingRequest) (*dto.BookingResponse, error)
-	ListMyBookings(userID string) ([]dto.BookingResponse, error)
+	ListMyBookings(userID string, page, perPage int) (*dto.BookingListResponse, error)
 	GetBookingDetail(bookingID, userID string, isAdmin bool) (*dto.BookingDetailResponse, error)
 	CancelBooking(bookingID, userID string) error
-	ListAllBookings() ([]dto.BookingResponse, error)
+	ListAllBookings(page, perPage int) (*dto.BookingListResponse, error)
 	ConfirmBooking(bookingID string) error
 }

@@ -43,3 +43,15 @@ func (r *repository) Update(user *domain.User) error {
 func (r *repository) Delete(id uuid.UUID) error {
 	return r.db.Delete(&domain.User{}, id).Error
 }
+
+func (r *repository) FindAll() ([]domain.User, error) {
+	var users []domain.User
+	err := r.db.Find(&users).Error
+	return users, err
+}
+
+func (r *repository) FindAllWithRole() ([]domain.User, error) {
+	var users []domain.User
+	err := r.db.Find(&users).Error
+	return users, err
+}

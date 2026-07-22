@@ -50,3 +50,56 @@ func (h *Handler) UpdateProfile(c fiber.Ctx) error {
 
 	return response.OK(c, "profile updated", result)
 }
+
+func (h *Handler) ListAll(c fiber.Ctx) error {
+	result, err := h.service.ListAll()
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, "users retrieved", result)
+}
+
+func (h *Handler) GetUserByID(c fiber.Ctx) error {
+	id := c.Params("id")
+
+	result, err := h.service.GetUserByID(id)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, "user retrieved", result)
+}
+
+func (h *Handler) UpdateUser(c fiber.Ctx) error {
+	id := c.Params("id")
+
+	var req dto.UpdateUserRequest
+	if err := c.Bind().JSON(&req); err != nil {
+		return response.Error(c, fiber.NewError(fiber.StatusBadRequest, "invalid request body"))
+	}
+
+	if errs := validator.Validate(req); errs != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"errors":  errs,
+		})
+	}
+
+	result, err := h.service.UpdateUser(id, req)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, "user updated", result)
+}
+
+func (h *Handler) DeleteUser(c fiber.Ctx) error {
+	id := c.Params("id")
+
+	if err := h.service.DeleteUser(id); err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, "user deleted", nil)
+}

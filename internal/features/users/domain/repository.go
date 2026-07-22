@@ -8,4 +8,15 @@ type Repository interface {
 	FindByEmail(email string) (*User, error)
 	Update(user *User) error
 	Delete(id uuid.UUID) error
+	FindAll() ([]User, error)
+	FindAllWithRole() ([]User, error)
+}
+
+type RoleRepository interface {
+	FindRoleByID(id uuid.UUID) (*Role, error)
+}
+
+type Role struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }

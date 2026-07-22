@@ -12,3 +12,9 @@ type UpdateProfileRequest struct {
 	Name        string `json:"name" validate:"omitempty,min=2,max=255"`
 	PhoneNumber string `json:"phone_number" validate:"omitempty,max=20"`
 }
+
+type UpdateUserRequest struct {
+	Name        string `json:"name" validate:"omitempty,min=2,max=255"`
+	PhoneNumber string `json:"phone_number" validate:"omitempty,max=20"`
+	RoleID      string `json:"role_id" validate:"omitempty"`
+}

@@ -19,6 +19,9 @@ func Seed(db *gorm.DB) error {
 	var roleCustomer migrations.Role
 	db.Where("name = ?", "customer").First(&roleCustomer)
 
+	// --- Permissions ---
+	seedPermissions(db, roleAdmin.ID, roleCustomer.ID)
+
 	// --- Users ---
 	users := []migrations.User{
 		{
@@ -211,6 +214,57 @@ func seedTents(db *gorm.DB, tents []migrations.Tent) {
 		var existing migrations.Tent
 		if err := db.Where("tent_type_id = ? AND name_or_number = ?", t.TentTypeID, t.NameOrNum).First(&existing).Error; err != nil {
 			db.Create(&t)
+		}
+	}
+}
+
+func seedPermissions(db *gorm.DB, adminRoleID, customerRoleID uuid.UUID) {
+	permissionNames := []string{
+		"create_booking", "cancel_booking", "view_own_bookings",
+		"manage_tents", "manage_rates", "manage_amenities",
+		"view_all_bookings", "confirm_bookings",
+		"manage_users", "manage_payments", "view_reports",
+	}
+
+	permIDs := make(map[string]uuid.UUID)
+	for _, name := range permissionNames {
+		var existing migrations.Permission
+		if err := db.Where("name = ?", name).First(&existing).Error; err != nil {
+			p := migrations.Permission{ID: uuid.New(), Name: name, Description: name}
+			db.Create(&p)
+			permIDs[name] = p.ID
+		} else {
+			permIDs[name] = existing.ID
+		}
+	}
+
+	// Admin gets all permissions
+	adminPerms := []string{
+		"manage_tents", "manage_rates", "manage_amenities",
+		"view_all_bookings", "confirm_bookings",
+		"manage_users", "manage_payments", "view_reports",
+	}
+	for _, name := range adminPerms {
+		var existing migrations.RolePermission
+		if err := db.Where("role_id = ? AND permission_id = ?", adminRoleID, permIDs[name]).First(&existing).Error; err != nil {
+			db.Create(&migrations.RolePermission{
+				ID:           uuid.New(),
+				RoleID:       adminRoleID,
+				PermissionID: permIDs[name],
+			})
+		}
+	}
+
+	// Customer gets booking permissions
+	customerPerms := []string{"create_booking", "cancel_booking", "view_own_bookings"}
+	for _, name := range customerPerms {
+		var existing migrations.RolePermission
+		if err := db.Where("role_id = ? AND permission_id = ?", customerRoleID, permIDs[name]).First(&existing).Error; err != nil {
+			db.Create(&migrations.RolePermission{
+				ID:           uuid.New(),
+				RoleID:       customerRoleID,
+				PermissionID: permIDs[name],
+			})
 		}
 	}
 }

@@ -1,6 +1,8 @@
 package http
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings/domain"
 	"github.com/ramdhanrizkij/nest-glamping-api/internal/features/bookings/dto"
@@ -42,8 +44,10 @@ func (h *Handler) CreateBooking(c fiber.Ctx) error {
 
 func (h *Handler) ListMyBookings(c fiber.Ctx) error {
 	userID := auth.GetUserID(c)
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
 
-	result, err := h.service.ListMyBookings(userID)
+	result, err := h.service.ListMyBookings(userID, page, perPage)
 	if err != nil {
 		return response.Error(c, err)
 	}
@@ -75,7 +79,10 @@ func (h *Handler) CancelBooking(c fiber.Ctx) error {
 }
 
 func (h *Handler) ListAllBookings(c fiber.Ctx) error {
-	result, err := h.service.ListAllBookings()
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
+
+	result, err := h.service.ListAllBookings(page, perPage)
 	if err != nil {
 		return response.Error(c, err)
 	}
